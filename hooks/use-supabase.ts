@@ -14,11 +14,12 @@ export const supabase =
 
 // Usuarios por defecto (fallback si no hay Supabase)
 const DEFAULT_USERS: User[] = [
-  { id: "1", name: "Vale", role: "vale" },
-  { id: "2", name: "Lucho", role: "armador" },
-  { id: "3", name: "Franco", role: "armador" },
-  { id: "4", name: "Negro", role: "armador" },
+  { id: "vale-1", name: "Vale", role: "vale" },
+  { id: "lucho-1", name: "Lucho", role: "armador" },
+  { id: "franco-1", name: "Franco", role: "armador" },
+  { id: "negro-1", name: "Negro", role: "armador" },
 ]
+
 
 // Funciones para manejar la persistencia del usuario por dispositivo
 export const saveCurrentUser = (user: User) => {
