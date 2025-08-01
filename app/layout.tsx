@@ -6,9 +6,15 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Gestión de Pedidos",
+  title: "Iseas - Gestión de Pedidos",
   description: "Sistema completo de gestión de pedidos con trazabilidad",
-    generator: 'v0.dev'
+  icons: {
+    icon: [
+      { url: "/alfonsa32x32.png", sizes: "32x32", type: "image/png" },
+      "/alfonsa32x32.png", // fallback
+    ],
+    apple: "/alfonsa32x32.png",
+  },
 }
 
 export default function RootLayout({
@@ -19,6 +25,8 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={inter.className}>{children}</body>
+      <link rel="icon" type="image/png" sizes="32x32" href="/alfonsa32x32.png" />
+        <link rel="apple-touch-icon" href="/alfonsa32x32.png" />
     </html>
   )
 }
