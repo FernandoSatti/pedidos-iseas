@@ -7,3 +7,4 @@ INSERT INTO public.users (id, name, role) VALUES
   ('camilo-1', 'Camilo', 'armador'),
   ('jesus-1', 'Jesus', 'armador'),
   ('eze-1', 'Eze', 'armador');
+  ('chino-1', 'chino', 'armador');

@@ -18,6 +18,7 @@ const DEFAULT_USERS: User[] = [
   { id: "camilo-1", name: "Camilo", role: "armador" },
   { id: "jesus-1", name: "Jesus", role: "armador" },
   { id: "eze-1", name: "Eze", role: "armador" },
+  { id: "chino-1", name: "chino", role: "armador" }, // nuevo
 ]
 
 
