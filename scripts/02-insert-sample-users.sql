@@ -1,9 +1,9 @@
 -- Limpiar usuarios existentes
 DELETE FROM public.users;
 
--- Insertar usuarios con IDs definidos
+-- Insertar usuarios con IDs definidos nuevos
 INSERT INTO public.users (id, name, role) VALUES 
-  ('vale-1', 'Vale', 'vale'),
-  ('lucho-1', 'Lucho', 'armador'),
-  ('franco-1', 'Franco', 'armador'),
-  ('negro-1', 'Negro', 'armador');
+  ('riki-1', 'Riki', 'vale'),        -- reemplaza a Vale
+  ('camilo-1', 'Camilo', 'armador'),
+  ('jesus-1', 'Jesus', 'armador'),
+  ('eze-1', 'Eze', 'armador');
