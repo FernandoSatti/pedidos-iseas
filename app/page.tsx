@@ -131,6 +131,7 @@ export default function OrderManagement() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [selectedCompletedOrder, setSelectedCompletedOrder] = useState<Order | null>(null)
   const [activeTab, setActiveTab] = useState("active")
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all")
   const [previousOrders, setPreviousOrders] = useState<Order[]>([])
   const [isRefreshing, setIsRefreshing] = useState(false)
   const {
@@ -148,7 +149,7 @@ export default function OrderManagement() {
 
   const { notifications, addNotification, removeNotification } = useNotifications()
 
-const handleRefresh = async () => {
+  const handleRefresh = async () => {
     setIsRefreshing(true)
     try {
       const ordersData = await fetchOrders()
@@ -251,20 +252,30 @@ const handleRefresh = async () => {
     }
   }, [isConnectedToSupabase])
 
-  // Filtrar pedidos activos y completados
-  const activeOrders = orders.filter((order) => order.status !== "pagado")
+// Filtrar pedidos por categorías
+  const activeOrders = orders.filter((order) => order.status !== "pagado" && order.status !== "entregado")
+  const pendingPaymentOrders = orders.filter((order) => order.status === "entregado" && !order.isPaid)
   const completedOrders = orders.filter((order) => order.status === "pagado")
 
   // Aplicar filtro de búsqueda
   const getFilteredOrders = (ordersList: Order[]) => {
-    return ordersList.filter(
+    let filtered = ordersList.filter(
       (order) =>
         order.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.id.toLowerCase().includes(searchTerm.toLowerCase()),
     )
+
+
+    // Aplicar filtro por estado si no es "all"
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((order) => order.status === statusFilter)
+    }
+
+    return filtered
   }
 
   const filteredActiveOrders = getFilteredOrders(activeOrders)
+  const filteredPendingPaymentOrders = getFilteredOrders(pendingPaymentOrders)
   const filteredCompletedOrders = getFilteredOrders(completedOrders)
 
   // Crear nuevo pedido
@@ -442,9 +453,8 @@ const handleRefresh = async () => {
     return (
       <Card
         key={order.id}
-        className={`cursor-pointer hover:shadow-lg transition-shadow ${getOrderPriorityColor(order)} ${
-          !canWork ? "opacity-75" : ""
-        }`}
+        className={`cursor-pointer hover:shadow-lg transition-shadow ${getOrderPriorityColor(order)} ${!canWork ? "opacity-75" : ""
+          }`}
         onClick={() => (isCompleted ? handleCompletedOrderSelect(order) : handleOrderSelect(order))}
       >
         <CardHeader className="pb-3">
@@ -662,6 +672,14 @@ const handleRefresh = async () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <a
+                href="https://v0-stock-control-system-three.vercel.app/"
+                //target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2 bg-white"
+              >
+                Control de Stock
+              </a>
               <Button
                 onClick={handleRefresh}
                 disabled={isRefreshing || loading}
@@ -695,19 +713,26 @@ const handleRefresh = async () => {
 
         {/* Tabs para Pedidos Activos y Completados */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="active" className="flex items-center gap-2">
-              <Package className="w-4 h-4" />
-              Pedidos Activos ({filteredActiveOrders.length})
-            </TabsTrigger>
-            <TabsTrigger value="completed" className="flex items-center gap-2">
-              <History className="w-4 h-4" />
-              Completados ({filteredCompletedOrders.length})
-            </TabsTrigger>
-          </TabsList>
+          <TabsList className="grid w-full grid-cols-3 max-w-2xl">
+  <TabsTrigger value="active" className="flex items-center gap-2">
+    <Package className="w-4 h-4" />
+    Activos ({filteredActiveOrders.length})
+  </TabsTrigger>
 
-          {/* Búsqueda */}
-          <div className="mt-6 mb-6">
+  <TabsTrigger value="pending-payment" className="flex items-center gap-2">
+    <DollarSign className="w-4 h-4" />
+    Pagos Pendientes ({filteredPendingPaymentOrders.length})
+  </TabsTrigger>
+
+  <TabsTrigger value="completed" className="flex items-center gap-2">
+    <History className="w-4 h-4" />
+    Completados ({filteredCompletedOrders.length})
+  </TabsTrigger>
+</TabsList>
+
+          
+          {/* Búsqueda y Filtros */}
+          <div className="mt-6 mb-6 flex flex-col sm:flex-row gap-4">
             <div className="relative max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
@@ -717,6 +742,21 @@ const handleRefresh = async () => {
                 className="pl-10"
               />
             </div>
+            {activeTab === "active" && (
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as OrderStatus | "all")}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-xs"
+              >
+                <option value="all">Todos los estados</option>
+                <option value="en_armado">En Armado</option>
+                <option value="armado">Armado</option>
+                <option value="armado_controlado">Armado Controlado</option>
+                <option value="facturado">Facturado</option>
+                <option value="factura_controlada">Factura Controlada</option>
+                <option value="en_transito">En Tránsito</option>
+              </select>
+            )}
           </div>
 
           <TabsContent value="active">
@@ -750,6 +790,33 @@ const handleRefresh = async () => {
             )}
           </TabsContent>
 
+<TabsContent value="pending-payment">
+            {loading ? (
+              <div className="text-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+                <p>Cargando pagos pendientes...</p>
+              </div>
+            ) : (
+              <>
+                {/* Lista de pedidos con pagos pendientes */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredPendingPaymentOrders.map((order) => renderOrderCard(order, true, false))}
+                </div>
+
+                {filteredPendingPaymentOrders.length === 0 && (
+                  <div className="text-center py-12">
+                    <DollarSign className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No hay pagos pendientes</h3>
+                    <p className="text-gray-600">
+                      {searchTerm
+                        ? "No se encontraron pedidos con pagos pendientes con ese criterio"
+                        : "Los pedidos entregados pendientes de pago aparecerán aquí"}
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+          </TabsContent>
           <TabsContent value="completed">
             {loading ? (
               <div className="text-center py-12">
@@ -813,3 +880,4 @@ const handleRefresh = async () => {
     </div>
   )
 }
+
