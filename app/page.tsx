@@ -642,21 +642,32 @@ export default function OrderManagement() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-2xl">
-            <TabsTrigger value="active" className="flex items-center gap-2">
-              <Package className="w-4 h-4" />
-              Activos ({filteredActiveOrders.length})
-            </TabsTrigger>
+  {/* Contenedor: fila única con scroll en mobile */}
+  <TabsList className="flex w-full max-w-2xl overflow-x-auto whitespace-nowrap gap-2 p-1 h-10">
 
-            <TabsTrigger value="pending-payment" className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4" />
-              Pagos Pendientes ({filteredPendingPaymentOrders.length})
-            </TabsTrigger>
+    <TabsTrigger
+      value="active"
+      className="flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm"
+    >
+      <Package className="w-4 h-4" />
+      Activos ({filteredActiveOrders.length})
+    </TabsTrigger>
 
-            <TabsTrigger value="completed" className="flex items-center gap-2">
-              <History className="w-4 h-4" />
-              Completados ({filteredCompletedOrders.length})
-            </TabsTrigger>
+    <TabsTrigger
+      value="pending-payment"
+      className="flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm"
+    >
+      <DollarSign className="w-4 h-4" />
+      sin pagar ({filteredPendingPaymentOrders.length})
+    </TabsTrigger>
+
+    <TabsTrigger
+      value="completed"
+      className="flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm"
+    >
+      <History className="w-4 h-4" />
+      Listos ({filteredCompletedOrders.length})
+    </TabsTrigger>
           </TabsList>
 
           {/* Buscador + Filtros */}
